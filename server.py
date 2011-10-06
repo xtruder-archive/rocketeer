@@ -1,6 +1,9 @@
-import web
 import threading
 import copy
+
+from threading import Thread
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
 from synch import synchronous
 
@@ -20,14 +23,35 @@ class StreamersHandler(object):
 
     @synchronous("StreamerRegisterLock")
     def GetStreamers(self):
-        return self.streamers
+        return self.streamers.keys()
 
     @synchronous("StreamerRegisterLock")
-    def GetStreamer(self, name):
+    def CallStreamer(self, name, function, *args, **kwargs):
         if self.streamers.has_key(name):
-            return self.streamers[name]
+            f= getattr(self.streamers[name], function, None)
+            if f:
+                return f(*args)
         return None
 
-class StreamersRequestHandler(StreamerHandler):
-    def __init__(self):
-        pass
+class Server(Thread):
+    def __init__(self, requestHandler, host="localhost", port=8000):
+        Thread.__init__(self)
+
+        self.server = SimpleXMLRPCServer((host, port))
+        self.server.register_introspection_functions()
+        self.server.register_instance(requestHandler, allow_dotted_names=True)
+
+        self.requestHandler= requestHandler
+
+    def run(self):
+        self.server.serve_forever()
+
+    def __del__(self):
+        self.server.shutdown()
+
+    def GetRequestHandler(self):
+        return self.requestHandler
+
+class StreamersRequestHandler(StreamersHandler):
+    def __init__(self): StreamersHandler.__init__(self)
+
