@@ -1,47 +1,78 @@
 import threading
 import copy
+import random
 
 from threading import Thread
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, SimpleXMLRPCRequestHandler
 
 from synch import synchronous
 
-class StreamRestServer(threading.Thread):
-    def run(self):
-        urls= ()
-
 class StreamersHandler(object):
-    def __init__(self):
+    def __init__(self, server):
+        self.server= server
+
         self.streamers= {}
+        self.instances= {}
 
         self.StreamerRegisterLock= threading.RLock()
+        self.StreamerInstanceLock= threading.RLock()
 
     @synchronous("StreamerRegisterLock")
     def RegisterStreamer(self, name, streamer):
+        if not streamer:
+            raise Exception("Streamer not defined.")
+
         self.streamers[name]= streamer
 
     @synchronous("StreamerRegisterLock")
     def GetStreamers(self):
+        print "here"
         return self.streamers.keys()
 
     @synchronous("StreamerRegisterLock")
-    def CallStreamer(self, name, function, *args, **kwargs):
-        if self.streamers.has_key(name):
-            f= getattr(self.streamers[name], function, None)
-            if f:
-                return f(*args)
-        return None
+    @synchronous("StreamerInstanceLock")
+    def CreateStreamer(self, name):
+        if name not in self.streamers:
+            return None
+
+        id= random.getrandbits(16)
+        self.instances[id]= (self.streamers[name](), name)
+
+        dispatcher= SimpleXMLRPCDispatcher()
+        dispatcher.register_introspection_functions()
+        dispatcher.register_instance(self.instances[id][0])
+        self.server.add_dispatcher( "/"+str(id), dispatcher)
+
+        return id
+
+    @synchronous("StreamerInstanceLock")
+    def GetStreamerInstances(self):
+        ret=()
+        for id in self.instances.keys():
+            ret+= ((id, self.instances[id][1]),)
+
+        return ret
+
+    @synchronous("StreamerInstanceLock")
+    def DestroyStreamer(self, id):
+        if self.instances.has_key(id):
+            return None
+        del(self.server.dispatchers["/"+str(id)])
+        del(self.instances[id])
+
+class RHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = None
 
 class Server(Thread):
-    def __init__(self, requestHandler, host="localhost", port=8000):
+    def __init__(self, requestHandler, host="localhost", port=8400):
         Thread.__init__(self)
 
-        self.server = SimpleXMLRPCServer((host, port))
-        self.server.register_introspection_functions()
-        self.server.register_instance(requestHandler, allow_dotted_names=True)
-
-        self.requestHandler= requestHandler
+        self.server = MultiPathXMLRPCServer((host, port), requestHandler=RHandler)
+        self.requestHandler= requestHandler(self.server)
+        self.dispatcher= SimpleXMLRPCDispatcher()
+        self.dispatcher.register_introspection_functions()
+        self.dispatcher.register_instance(self.requestHandler)
+        self.server.add_dispatcher("/", self.dispatcher)
 
     def run(self):
         self.server.serve_forever()
@@ -51,7 +82,3 @@ class Server(Thread):
 
     def GetRequestHandler(self):
         return self.requestHandler
-
-class StreamersRequestHandler(StreamersHandler):
-    def __init__(self): StreamersHandler.__init__(self)
-

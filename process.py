@@ -4,12 +4,26 @@ import fcntl
 import time
 
 class Process(object):
-    def __init__(self,command, template=False):
+    def __init__(self,command="", template=False):
         self.command= command
         self.template= template
 
+    def GetTemplateValues(self):
+        pass
+
+    def _GenCommand(self):
+        if self.template:
+            instance= self.template(self.GetTemplateValues())
+            return self._GenTemplate(instance.filename, instance)
+        else:
+            return self.command
+
+    def _GenTemplate(filename, instance):
+        txt= pystache.Template(FileIO(filename).read(), instance).render()
+        return re.sub('[\\n\\t\\\\]+', '', txt).split()
+
     def Start(self):
-        self.process = subprocess.Popen(self.command.split(), \
+        self.process = subprocess.Popen(self._GenCommand(), \
                 stderr = subprocess.PIPE, \
                 stdout = subprocess.PIPE )
         self._setNonBlocking()
@@ -51,7 +65,7 @@ class Process(object):
             lines+= [line]
 
 class StatusUpdateProcess(Process):
-    def __init__(self, command, template=False):
+    def __init__(self, command="", template=False):
         Process.__init__(self, command, template)
 
     def UpdateStatus(Process):
