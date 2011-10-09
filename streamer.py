@@ -1,4 +1,5 @@
 import threading
+import copy
 
 from synch import synchronous
 
@@ -10,40 +11,11 @@ class StreamerStatus:
 
 class Streamer(object):
     def __init__(self):
-        self.StreamerLock= threading.RLock()
-
-    @synchronous("StreamerLock")
-    def GetStreamerRunStatus(self):
-        pass
-
-    @synchronous("StreamerLock")
-    def _SetStreamerRunStatus(self, status):
-        pass
-
-    @synchronous("StreamerLock")
-    def GetStreamerStatus(self):
-        pass
-
-    @synchronous("StreamerLock")
-    def _SetStreamerStatus(self, status):
-        pass
-
-    @synchronous("StreamerLock")
-    def StartStreamer(self):
-        pass
-
-    @synchronous("StreamerLock")
-    def StopStreamer(self):
-        pass
-
-class StreamerProcess(Streamer): #, Process):
-    def __init__(self, template=False):
-        Streamer.__init__(self)
-        self.template= template
-
         self.streamerRunStatus= StreamerStatus.UNKNOWN
         self.streamerStatus= None
-        self.template= template
+
+        self.StreamerLock= threading.RLock()
+        self.values= {}
 
     @synchronous("StreamerLock")
     def GetStreamerRunStatus(self):
@@ -60,6 +32,34 @@ class StreamerProcess(Streamer): #, Process):
     @synchronous("StreamerLock")
     def _SetStreamerStatus(self, status):
         self.streamerStatus= status
+
+    @synchronous("StreamerLock")
+    def SetStreamerValue(self, key, value):
+        self.values[key]= value
+
+    @synchronous("StreamerLock")
+    def GetStreamerValue(self, key):
+        if self.values.has_key(key):
+            return self.values[key]
+
+        return None
+
+    @synchronous("StreamerLock")
+    def GetStreamerValues(self):
+        return copy.copy(self.values)
+
+    @synchronous("StreamerLock")
+    def StartStreamer(self):
+        pass
+
+    @synchronous("StreamerLock")
+    def StopStreamer(self):
+        pass
+
+class StreamerProcess(Streamer): #, Process):
+    def __init__(self, template=False):
+        Streamer.__init__(self)
+        self.template= template
 
     @synchronous("StreamerLock")
     def StartStreamer(self):
