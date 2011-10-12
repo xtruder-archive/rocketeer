@@ -1,0 +1,4 @@
+bin/*
+include/* 
+lib/*
+pipa_stream3.egg-info
