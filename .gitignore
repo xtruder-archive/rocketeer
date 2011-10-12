@@ -1,4 +1,4 @@
+include/*
 bin/*
-include/* 
 lib/*
-pipa_stream3.egg-info
+pipa_stream3.egg-info/*
