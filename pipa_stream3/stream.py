@@ -37,5 +37,9 @@ streamersHandler.RegisterStreamer(testStream)
 srv.start()
 
 while(1):
-    streamersHandler.UpdateStatus()
-    sleep(.01)
+    try:
+        streamersHandler.UpdateStatus()
+        sleep(.01)
+    except KeyboardInterrupt:
+        srv.__del__()
+        break
