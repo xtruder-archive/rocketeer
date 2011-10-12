@@ -1,76 +1,41 @@
-#!/bin/python
-import re
-import pystache
-import sys
-import time
-from time import gmtime, strftime
-from io import FileIO
+from time import sleep
 
 from ffmpegprocess import FFMpegProcess
+from server import Server, StreamersHandler
 
-class h264Tpl(pystache.View):
-    def __init__(self, dumpf, res):
-        pystache.View.__init__(self)
+from stream_h264 import h264Tpl
+from stream_webm import webmTpl
+from stream_prosojnice import prosojniceTpl
+from stream_test import testTpl
 
-        self.dumpf= dumpf
-        self.res= res
-    def dumpfile(self):
-        return self.dumpf
-    def resolution(self):
-        return self.res
-
-class prosojniceTpl(pystache.View):
+class h264Stream(FFMpegProcess):
     def __init__(self):
-        pystache.View.__init__(self)
+        FFMpegProcess.__init__(self,template=h264Tpl)
+        self.filename= "stream_h264.tpl"
 
-def gen_template(filename, instance):
-    txt= pystache.Template(FileIO(filename).read(), instance).render()
-    return re.sub('[\\n\\t\\\\]+', '', txt).split()
+class webmStream(FFMpegProcess):
+    def __init__(self):
+        FFMpegProcess.__init__(self,template=webmTpl)
+        self.filename= "stream_webm.tpl"
 
-if __name__ == "__main__":
-    dump_trailing= ".dv"
+class prosojniceStream(FFMpegProcess):
+    def __init__(self):
+        FFMpegProcess.__init__(self,template=prosojniceTpl)
+        self.filename= "stream_prosojnice.tpl"
 
-    dump= raw_input("Ime predavanja: ")
-    kamera= raw_input("Katero kamero uporabljate(nova/stara)?")
-    date= strftime("%d-%m-%Y-%H-%M", gmtime())
-    if not dump:
-        dump= date+dump_trailing
-    else:
-        dump= date+"_"+dump+dump_trailing
-    if kamera=="stara":
-        res= "768x567"
-    else:
-        res= "720x405"
+class testStream(FFMpegProcess):
+    def __init__(self):
+        FFMpegProcess.__init__(self,template=testTpl)
+        self.filename= "stream_test.tpl"
 
-    h264= h264Tpl(dump,res)
-    streamCmd= gen_template("stream.h264.tpl", h264)
-    print "Stream command:\n\t", " ".join(streamCmd)
+srv= Server(StreamersHandler)
+streamersHandler= srv.GetRequestHandler()
+streamersHandler.RegisterStreamer(h264Stream)
+streamersHandler.RegisterStreamer(webmStream)
+streamersHandler.RegisterStreamer(prosojniceStream)
+streamersHandler.RegisterStreamer(testStream)
+srv.start()
 
-    prosojnice= prosojniceTpl()
-    prosojniceCmd= gen_template("prosojnice.tpl", prosojnice)
-    print "Prosojnice command:\n\t", " ".join(prosojniceCmd)
-
-    streamProcess= FFMpegProcess(" ".join(streamCmd))
-    prosojniceProcess= FFMpegProcess(" ".join(prosojniceCmd))
-
-    print "Starting stream - press ctrl+c to stop: "
-    streamProcess.Start()
-    prosojniceProcess.Start()
-
-    while(1):
-        res1= streamProcess.UpdateStatus()
-        res2= prosojniceProcess.UpdateStatus()
-
-        status1= streamProcess.GetStreamerStatus()
-        status2= prosojniceProcess.GetStreamerStatus()
-
-        sys.stdout.write("\rStream[ run_status: "+str(streamProcess.GetStreamerRunStatus()))
-        if status1:
-            sys.stdout.write(" f: "+status1[0][1])
-        sys.stdout.write("]")
-        sys.stdout.write(" prosojnice[ run_status: "+str(prosojniceProcess.GetStreamerRunStatus()))
-        if status2:
-            sys.stdout.write(" f: "+status2[0][1])
-        sys.stdout.write("]")
-
-        time.sleep(0.01)
+while(1):
+    streamersHandler.UpdateStatus()
+    sleep(.01)

@@ -7,7 +7,8 @@ class StreamerStatus:
     STOPPED= 0
     RUNNING= 1
     ERROR= 2
-    UNKNOWN= 3
+    ENDED= 3
+    UNKNOWN= 4
 
 class Streamer(object):
     def __init__(self):
@@ -17,8 +18,13 @@ class Streamer(object):
         self.StreamerLock= threading.RLock()
         self.values= {}
 
+    def __del__(self):
+        self.StopStreamer()
+
     @synchronous("StreamerLock")
     def GetStreamerRunStatus(self):
+        if self.streamerRunStatus==None:
+            return -1
         return self.streamerRunStatus
 
     @synchronous("StreamerLock")
@@ -27,6 +33,8 @@ class Streamer(object):
 
     @synchronous("StreamerLock")
     def GetStreamerStatus(self):
+        if self.streamerStatus==None:
+            return -1
         return self.streamerStatus
 
     @synchronous("StreamerLock")
@@ -64,7 +72,9 @@ class StreamerProcess(Streamer): #, Process):
     @synchronous("StreamerLock")
     def StartStreamer(self):
         self.Start() # We can do that in python :)
+        return 1
 
     @synchronous("StreamerLock")
     def StopStreamer(self):
         self.Terminate() # We can do that in python :)
+        return 1

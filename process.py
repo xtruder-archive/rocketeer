@@ -2,31 +2,47 @@ import os
 import subprocess
 import fcntl
 import time
+import re
+import pystache
+
+from io import FileIO
 
 class Process(object):
     def __init__(self,command="", template=False):
         self.command= command
         self.template= template
+        self.started= False
 
-    def GetTemplateValues(self):
+    def _GetTemplateValues(self):
         pass
 
     def _GenCommand(self):
         if self.template:
-            instance= self.template(self.GetTemplateValues())
-            return self._GenTemplate(instance.filename, instance)
+            print "template",self.template
+            print self._GetTemplateValues()
+
+            instance= self.template(self._GetTemplateValues())
+            return self._GenTemplate(self.filename, instance)
         else:
             return self.command
 
-    def _GenTemplate(filename, instance):
+    def _GenTemplate(self, filename, instance):
         txt= pystache.Template(FileIO(filename).read(), instance).render()
         return re.sub('[\\n\\t\\\\]+', '', txt).split()
 
     def Start(self):
-        self.process = subprocess.Popen(self._GenCommand(), \
-                stderr = subprocess.PIPE, \
-                stdout = subprocess.PIPE )
+        if self.isRunning():
+            self.Terminate()
+        if self.started:
+            self.started= False
+
+        command= self._GenCommand()
+        if isinstance(command, basestring):
+            command= re.sub('[\\n\\t\\\\]+', '', command).split()
+        print "Process command is", command
+        self.process = subprocess.Popen(command, stderr = subprocess.PIPE, stdout = subprocess.PIPE )
         self._setNonBlocking()
+        print "Process created"
 
     def _setNonBlocking(self):
         fd = self.process.stderr.fileno()
@@ -34,16 +50,24 @@ class Process(object):
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
     def isRunning(self):
+        if not hasattr(self,"process"):
+            return False
         self.process.poll()
         if self.process.returncode==None:
             return True
         return False
 
     def Terminate(self):
-        self.process.terminate()
+        try:
+            self.process.terminate()
+        except:
+            pass
 
     def Kill(self):
-        self.process.kill()
+        try:
+            self.process.kill()
+        except:
+            pass
 
     def ReadLine(self):
         line = ""

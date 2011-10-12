@@ -7,6 +7,8 @@ from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, Si
 
 from synch import synchronous
 
+from process import StatusUpdateProcess
+
 class StreamersHandler(object):
     def __init__(self, server):
         self.server= server
@@ -18,9 +20,12 @@ class StreamersHandler(object):
         self.StreamerInstanceLock= threading.RLock()
 
     @synchronous("StreamerRegisterLock")
-    def RegisterStreamer(self, name, streamer):
+    def RegisterStreamer(self, streamer, name=""):
         if not streamer:
-            raise Exception("Streamer not defined.")
+            raise Exception("Cannot register streamer!")
+
+        if not name:
+            name=streamer.__name__
 
         self.streamers[name]= streamer
 
@@ -33,7 +38,7 @@ class StreamersHandler(object):
     @synchronous("StreamerInstanceLock")
     def CreateStreamer(self, name):
         if name not in self.streamers:
-            return None
+            return 0
 
         id= random.getrandbits(16)
         self.instances[id]= (self.streamers[name](), name)
@@ -54,11 +59,21 @@ class StreamersHandler(object):
         return ret
 
     @synchronous("StreamerInstanceLock")
-    def DestroyStreamer(self, id):
-        if self.instances.has_key(id):
-            return None
+    def DestroyInstance(self, id):
+        if not self.instances.has_key(id):
+            return False
         del(self.server.dispatchers["/"+str(id)])
+        self.instances[id][0].__del__()
         del(self.instances[id])
+
+        return True
+
+    def UpdateStatus(self):
+        for key in self.instances:
+            instance= self.instances[key][0]
+            if isinstance(instance.UpdateStatus(),
+                    StatusUpdateProcess):
+                instance.UpdateStatus()
 
 class RHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = None
