@@ -7,10 +7,10 @@ from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, Si
 
 from synch import synchronous
 
-from process import StatusUpdateProcess
+from process import StatusUpdateProcess, StreamerStatus
 
 class StreamersHandler(object):
-    def __init__(self, server):
+    def __init__(self, server, auto_close= True):
         self.server= server
 
         self.streamers= {}
@@ -69,11 +69,19 @@ class StreamersHandler(object):
         return True
 
     def UpdateStatus(self):
+        delete=[] # Auto close objects
         for key in self.instances:
             instance= self.instances[key][0]
-            if isinstance(instance.UpdateStatus(),
+            if isinstance(instance,
                     StatusUpdateProcess):
                 instance.UpdateStatus()
+                if( self.auto_close and # in case of auto_close 
+                    instance.GetStreamerRunStatus()==StreamerStatus.ENDED):
+                    delete+=[key]
+
+        for key in delete:
+            del(instance[key])
+
 
 class RHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = None
@@ -83,7 +91,7 @@ class Server(Thread):
         Thread.__init__(self)
 
         self.server = MultiPathXMLRPCServer((host, port), requestHandler=RHandler)
-        self.requestHandler= requestHandler(self.server)
+        self.requestHandler= requestHandler(self.server, True)
         self.dispatcher= SimpleXMLRPCDispatcher()
         self.dispatcher.register_introspection_functions()
         self.dispatcher.register_instance(self.requestHandler)
