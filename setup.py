@@ -26,7 +26,7 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
     ],
-    install_requires = [ "pystache" ],
+    install_requires = [ "pystache", "pylirc2" ],
     entry_points="""
     [console_scripts]
     pipa_stream3= pipa_stream3.cli:main

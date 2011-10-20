@@ -16,13 +16,16 @@ if(pylirc.init("pylirc", "./conf", blocking)):
 
         for (code) in s:
             if(code["config"] == "start_stream"):
-                if h264_client and
-                    h264_client.GetStreamerStatus()!=StreamerStatus.RUNNING:
+                if (h264_client and
+                        h264_client.GetStreamerStatus()!=StreamerStatus.RUNNING) or
+                        not h264_client:
+                    print("Creating new streamer")
                     h264= client.CreateStreamer("h264Stream")
                     h264_client= xmlrpclib.ServerProxy("http://localhost:8400/"+str(h264))
                     h264_client.StartStreamer()
                 else:
-                    h264_client.StopStreamer()
-
+                    print("Stoping stream")
+                    client.DestroyInstance(h264)
+                    h264_client= None
 
     pylirc.exit()
