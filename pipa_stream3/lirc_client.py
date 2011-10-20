@@ -22,6 +22,7 @@ if(pylirc.init("pylirc", "./conf", blocking)):
                     print("Creating new streamer")
                     h264= client.CreateStreamer("h264Stream")
                     h264_client= xmlrpclib.ServerProxy("http://localhost:8400/"+str(h264))
+                    h264_cleint.SetStreamerValue("auto_restart", 1)
                     h264_client.StartStreamer()
                 else:
                     print("Stoping stream")
