@@ -7,10 +7,11 @@ from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, Si
 
 from synch import synchronous
 
-from process import StatusUpdateProcess, StreamerStatus
+from process import StatusUpdateProcess
+from streamer import StreamerStatus
 
 class StreamersHandler(object):
-    def __init__(self, server, auto_close= True):
+    def __init__(self, server, auto_close= False):
         self.server= server
 
         self.streamers= {}

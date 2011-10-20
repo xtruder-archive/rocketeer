@@ -2,6 +2,8 @@ import xmlrpclib
 
 from time import sleep
 
+import pylirc
+
 client = xmlrpclib.ServerProxy("http://localhost:8400/")
 h264_client= None
 
@@ -16,8 +18,8 @@ if(pylirc.init("pylirc", "./conf", blocking)):
 
         for (code) in s:
             if(code["config"] == "start_stream"):
-                if (h264_client and
-                        h264_client.GetStreamerStatus()!=StreamerStatus.RUNNING) or
+                if (h264_client and \
+                        h264_client.GetStreamerStatus()!=StreamerStatus.RUNNING) or \
                         not h264_client:
                     print("Creating new streamer")
                     h264= client.CreateStreamer("h264Stream")

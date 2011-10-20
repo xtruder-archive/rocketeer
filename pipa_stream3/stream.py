@@ -28,18 +28,13 @@ class testStream(FFMpegProcess):
         FFMpegProcess.__init__(self,template=testTpl)
         self.filename= "stream_test.tpl"
 
-srv= Server(StreamersHandler)
-streamersHandler= srv.GetRequestHandler()
-streamersHandler.RegisterStreamer(h264Stream)
-streamersHandler.RegisterStreamer(webmStream)
-streamersHandler.RegisterStreamer(prosojniceStream)
-streamersHandler.RegisterStreamer(testStream)
-srv.start()
+def CreateServer(ip="127.0.0.1", port=8400):
+    srv= Server(StreamersHandler, ip, port)
+    streamersHandler= srv.GetRequestHandler()
+    streamersHandler.RegisterStreamer(h264Stream)
+    streamersHandler.RegisterStreamer(webmStream)
+    streamersHandler.RegisterStreamer(prosojniceStream)
+    streamersHandler.RegisterStreamer(testStream)
+    srv.start()
 
-while(1):
-    try:
-        streamersHandler.UpdateStatus()
-        sleep(.01)
-    except KeyboardInterrupt:
-        srv.__del__()
-        break
+    return srv
