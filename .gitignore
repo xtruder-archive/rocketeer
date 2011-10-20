@@ -2,3 +2,4 @@ include/*
 bin/*
 lib/*
 pipa_stream3.egg-info/*
+*.pyc
