@@ -31,7 +31,8 @@ class Process(object):
             return self.command
 
     def _GenTemplate(self, filename, instance):
-        txt= pystache.Template(FileIO(filename).read(), instance).render()
+        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+        txt= pystache.Template(FileIO(path).read(), instance).render()
         return re.sub('[\\n\\t\\\\]+', '', txt).split()
 
     def Start(self):
@@ -68,6 +69,7 @@ class Process(object):
     def Terminate(self):
         try:
             self.process.terminate()
+            self.process.wait()
         except:
             pass
 
@@ -76,6 +78,7 @@ class Process(object):
     def Kill(self):
         try:
             self.process.kill()
+            self.process.wait()
         except:
             pass
 

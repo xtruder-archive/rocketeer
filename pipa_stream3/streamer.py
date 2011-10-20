@@ -24,7 +24,8 @@ class Streamer(object):
     @synchronous("StreamerLock")
     def GetStreamerRunStatus(self):
         if self.streamerRunStatus==None:
-            return -1
+            return 0
+
         return self.streamerRunStatus
 
     @synchronous("StreamerLock")
@@ -34,7 +35,7 @@ class Streamer(object):
     @synchronous("StreamerLock")
     def GetStreamerStatus(self):
         if self.streamerStatus==None:
-            return -1
+            return 0
         return self.streamerStatus
 
     @synchronous("StreamerLock")
@@ -45,12 +46,14 @@ class Streamer(object):
     def SetStreamerValue(self, key, value):
         self.values[key]= value
 
+        return 0
+
     @synchronous("StreamerLock")
     def GetStreamerValue(self, key):
         if self.values.has_key(key):
             return self.values[key]
 
-        return None
+        return 0
 
     @synchronous("StreamerLock")
     def GetStreamerValues(self):
@@ -71,10 +74,12 @@ class StreamerProcess(Streamer): #, Process):
 
     @synchronous("StreamerLock")
     def StartStreamer(self):
+        self._SetStreamerRunStatus(StreamerStatus.UNKNOWN)
         self.Start() # We can do that in python :)
         return 1
 
     @synchronous("StreamerLock")
     def StopStreamer(self):
+        print("Stopping process")
         self.Terminate() # We can do that in python :)
         return 1

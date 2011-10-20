@@ -34,6 +34,7 @@ class FFMpegProcess(StatusUpdateProcess, StreamerProcess):
 
             return None
 
+        print("running")
         self._SetStreamerRunStatus(StreamerStatus.RUNNING)
 
         #Store last update time for knowing if there was
