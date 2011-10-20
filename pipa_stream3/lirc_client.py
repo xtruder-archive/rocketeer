@@ -11,8 +11,6 @@ blocking= 1
 if(pylirc.init("pylirc", "./conf", blocking)):
     code= {"config": ""}
     while(code["config"] != "quit"):
-        h264= client.CreateStreamer("h264Stream")
-        
         #Read next code
         s= pylirc.nextcode(1)
 
@@ -30,4 +28,5 @@ if(pylirc.init("pylirc", "./conf", blocking)):
                     client.DestroyInstance(h264)
                     h264_client= None
 
+    client.DestroyInstances()
     pylirc.exit()
