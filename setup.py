@@ -29,6 +29,7 @@ setup(
     install_requires = [ "pystache", "pylirc2" ],
     entry_points="""
     [console_scripts]
-    pipa_stream3= pipa_stream3.cli:main
+    pstream3d= pipa_stream3.server_cli:main
+    pstream3_client= pipa_stream3.client_lirc:main
     """,
 )

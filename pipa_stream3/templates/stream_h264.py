@@ -1,4 +1,5 @@
 import pystache
+from time import strftime, gmtime
 class h264Tpl(pystache.View):
     def __init__(self, values):
         pystache.View.__init__(self)
@@ -14,4 +15,5 @@ class h264Tpl(pystache.View):
         if self.values.has_key("res"):
             return self.values["res"]
         else:
-            return "768x567"
+            return "640x480"
+            #return "768x567"

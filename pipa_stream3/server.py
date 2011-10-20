@@ -37,7 +37,7 @@ class StreamersHandler(object):
         print "here"
         return self.streamers.keys()
 
-    @synchronous("StreamerRegisterLock")
+#    @synchronous("StreamerRegisterLock")
     @synchronous("StreamerInstanceLock")
     def CreateStreamer(self, name):
         if name not in self.streamers:
@@ -76,6 +76,7 @@ class StreamersHandler(object):
         for id in self.instances.keys():
             self.DestroyInstance(id)
 
+    @synchronous("StreamerInstanceLock")
     def UpdateStatus(self):
         delete=[] # Auto close objects
         for key in self.instances:
@@ -86,16 +87,16 @@ class StreamersHandler(object):
                 #Auto close
                 if( self.auto_close and
                     instance.GetStreamerRunStatus()==StreamerStatus.ENDED):
-                    delete+=[key]
+                    delete+=[instance]
                 #Auto restart
                 elif( (instance.GetStreamerRunStatus()==StreamerStatus.ENDED or \
                       instance.GetStreamerRunStatus()==StreamerStatus.ERROR) and \
                         instance.GetStreamerValue("auto_restart") and not instance.correctly_terminated ) :
                     instance.StartStreamer()
 
-        for key in delete:
-            instance[key].__del__()
-            del(instance[key])
+        for instance in delete:
+            instance.__del__()
+            del(instance)
 
 
 class RHandler(SimpleXMLRPCRequestHandler):
@@ -106,7 +107,7 @@ class Server(Thread):
         Thread.__init__(self)
 
         self.server = MultiPathXMLRPCServer((host, port), requestHandler=RHandler)
-        self.requestHandler= requestHandler(self.server, True)
+        self.requestHandler= requestHandler(self.server, False)
         self.dispatcher= SimpleXMLRPCDispatcher()
         self.dispatcher.register_introspection_functions()
         self.dispatcher.register_instance(self.requestHandler)
