@@ -17,6 +17,8 @@ class StreamersHandler(object):
         self.streamers= {}
         self.instances= {}
 
+        self.auto_close= auto_close
+
         self.StreamerRegisterLock= threading.RLock()
         self.StreamerInstanceLock= threading.RLock()
 
@@ -68,6 +70,11 @@ class StreamersHandler(object):
         del(self.instances[id])
 
         return True
+
+    @synchronous("StreamerInstanceLock")
+    def DestroyInstances(self):
+        for id in self.instances.keys():
+            self.DestroyInstance(id)
 
     def UpdateStatus(self):
         delete=[] # Auto close objects
