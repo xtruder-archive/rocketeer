@@ -13,6 +13,10 @@ class Process(object):
         self.template= template
         self.started= False
 
+        #Flag if process was correctly terminated
+        #Only set if we call terminate or kill
+        self.correctly_terminated= False
+
     def _GetTemplateValues(self):
         pass
 
@@ -44,6 +48,8 @@ class Process(object):
         self._setNonBlocking()
         print "Process created"
 
+        self.correctly_terminated= False
+
     def _setNonBlocking(self):
         fd = self.process.stderr.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
@@ -51,6 +57,8 @@ class Process(object):
 
     def isRunning(self):
         if not hasattr(self,"process"):
+            return False
+        if not self.process:
             return False
         self.process.poll()
         if self.process.returncode==None:
@@ -63,11 +71,15 @@ class Process(object):
         except:
             pass
 
+        self.correctly_terminated= True
+
     def Kill(self):
         try:
             self.process.kill()
         except:
             pass
+
+        self.correctly_terminated= True
 
     def ReadLine(self):
         line = ""

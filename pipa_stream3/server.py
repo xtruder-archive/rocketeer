@@ -83,11 +83,18 @@ class StreamersHandler(object):
             if isinstance(instance,
                     StatusUpdateProcess):
                 instance.UpdateStatus()
-                if( self.auto_close and # in case of auto_close 
+                #Auto close
+                if( self.auto_close and
                     instance.GetStreamerRunStatus()==StreamerStatus.ENDED):
                     delete+=[key]
+                #Auto restart
+                elif( (instance.GetStreamerRunStatus()==StreamerStatus.ENDED or \
+                      instance.GetStreamerRunStatus()==StreamerStatus.ERROR) and \
+                        instance.GetStreamerValue("auto_restart") and not instance.correctly_terminated ) :
+                    instance.StartStreamer()
 
         for key in delete:
+            instance[key].__del__()
             del(instance[key])
 
 
