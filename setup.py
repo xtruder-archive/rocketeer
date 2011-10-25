@@ -12,19 +12,19 @@ def read(fname):
 
 setup(
     name = "pipa_stream3",
-    version = "0.1",
-    author = "Jaka Hudoklin",
+    version = "0.5",
+    author = "Kiberpipa",
     author_email = "jakahudoklin@gmail.com",
-    description = ("Start ffmpeg processes remotely and view status."),
-    license = "BSD",
+    description = ("Pipa stream 3rd generation"),
+    license = "GNU",
     keywords = "ffmpeg xmlrpc remote start",
-    url = "http://packages.python.org/an_example_pypi_project",
+    url = "https://github.com/offlinehacker/pipa_stream3",
     packages=find_packages(),
     long_description=read('README'),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Topic :: Utilities",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
     install_requires = [ "pystache", "pylirc2" ],
     entry_points="""
