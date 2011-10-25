@@ -39,6 +39,11 @@ How to create new streamer template:
 ------------------------------------
 Go to templates folder and you can see sample_template.py and sample_template.tpl. In your py file you define what varibales get passed to template, and in tpl file is template. It is based on mustache templating engine. You must remember that __init__ function of template gets values you set using SetStreamerValue as key value.
 
+TODO:
+-----
+- Add documentation
+- Add logging
+
 License:
 --------
 Pipa_stream3 is Copyright (C) 2011 kiberpipa.
