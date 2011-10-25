@@ -12,7 +12,7 @@ class webmTpl(pystache.View):
             return date
     def dumpfolder(self):
         if self.values.has_key("dump_folder"):
-            return self.values["dump_folder]
+            return self.values["dump_folder"]
         else:
             return "dump"
     def resolution(self):
