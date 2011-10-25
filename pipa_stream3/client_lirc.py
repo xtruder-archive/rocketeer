@@ -65,6 +65,7 @@ def main():
 
                 while h264_client.GetStreamerRunStatus()!=StreamerStatus.RUNNING:
                     sleep(.5)
+                print("Next code")
  
 
         client.DestroyInstances()

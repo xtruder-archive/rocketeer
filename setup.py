@@ -32,4 +32,5 @@ setup(
     pstream3d= pipa_stream3.server_cli:main
     pstream3_client= pipa_stream3.client_lirc:main
     """,
+    package_data={'pipa_stream3': ['templates/*.tpl']},
 )
