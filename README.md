@@ -12,6 +12,7 @@ It has xml-rpc interface, so you can create/start/stop stream remotely and set i
 Installation
 -----------
 This app works with python2.7, i didn't test with other python versions.
+
 - Install newest stable ffmpeg from git with whatever support you want.
 - Install liblirc if you want to control streams with your remote.
 - python setup.py install
@@ -19,12 +20,15 @@ This app works with python2.7, i didn't test with other python versions.
 Usage:
 ------
 There are two cli commands(add --help for more info):
+
 pstream3d - xml-rpc app server.
+
 pstream3_client - lirc client for daemon.
 
 API:
 ----
 Interface is xml-rpc on whatever port and host you set to daemon.
+
 You can access it on url "http://host:port/"
 
 First you should create streamer from list of avalible streamers. You can get list of avalible streamers with GetStreamers. Then you can create streamer using CreateStreamer and it will return instance id of newly created streamer. This will create streamer instance. You can get all streamer instances using GetStreamerInstances. You can destroy instance using DestroyInstance or to destroy all instances, call DestroyInstances.
