@@ -16,6 +16,8 @@ def main():
                       help="Ip where should i listen", dest="ip")
     parser.add_option("--port",
                       help="Port where should i bind", dest="port")
+    parser.add_option("--dump",
+                      help="Folder where should i dump", dest="dump")
     (options, args) = parser.parse_args()
 
     if options.daemon:
@@ -50,6 +52,8 @@ def main():
                 if (status!=StreamerStatus.RUNNING) or not status:
                     print("Creating new streamer")
                     h264= client.CreateStreamer("h264Stream")
+                    if options.dump:
+                        h264.SetStreamerValue("dumpfolder", options.dump)
                     print h264, client.GetStreamerInstances()
                     h264_client= xmlrpclib.ServerProxy("http://%s:%s/" % (ip,port) + str(h264))
                     h264_client.SetStreamerValue("auto_restart", 1)
