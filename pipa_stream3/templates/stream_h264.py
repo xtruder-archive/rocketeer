@@ -13,7 +13,7 @@ class h264Tpl(pystache.View):
             return date
     def dumpfolder(self):
         if self.values.has_key("dumpfolder"):
-            return self.values["dumpfolder]
+            return self.values["dumpfolder"]
         else:
             return "dump"
     def resolution(self):
