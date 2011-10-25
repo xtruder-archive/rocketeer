@@ -20,7 +20,7 @@ setup(
     keywords = "ffmpeg xmlrpc remote start",
     url = "https://github.com/offlinehacker/pipa_stream3",
     packages=find_packages(),
-    long_description=read('README'),
+    long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
