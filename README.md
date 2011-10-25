@@ -21,9 +21,8 @@ Usage:
 ------
 There are two cli commands(add --help for more info):
 
-pstream3d - xml-rpc app server.
-
-pstream3_client - lirc client for daemon.
+- pstream3d - xml-rpc app server.
+- pstream3_client - lirc client for daemon.
 
 API:
 ----
