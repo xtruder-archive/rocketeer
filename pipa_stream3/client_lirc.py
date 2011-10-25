@@ -37,6 +37,7 @@ def main():
         while(code["config"] != "quit"):
             #Read next code
             s= pylirc.nextcode(1)
+            #Right now i don't care what you press on remote.
             code["config"]= "start_stream"
 
             status= None
