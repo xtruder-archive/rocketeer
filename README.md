@@ -16,6 +16,10 @@ This app works with python2.7, i didn't test with other python versions.
 - Install newest stable ffmpeg from git with whatever support you want.
 - Install liblirc if you want to control streams with your remote.
 - python setup.py install
+- if you want to start on system startup there are init script avalible in init
+  folder and sample config in config folder.
+- Copy init scripts to /etc/init.d/
+- Copy config files to /etc/pstream/
 
 Usage:
 ------

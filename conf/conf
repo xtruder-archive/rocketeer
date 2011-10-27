@@ -1,0 +1,13 @@
+begin
+  remote = *
+  button = 3
+  prog = pylirc
+  config = quit
+end
+
+begin
+  remote = *
+  button = 4
+  prog = pylirc
+  config = start_stream
+end
