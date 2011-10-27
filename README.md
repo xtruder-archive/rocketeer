@@ -36,10 +36,22 @@ Interface is xml-rpc on whatever port and host you set to daemon.
 
 You can access it on url "http://host:port/"
 
-First you should create streamer from list of avalible streamers. You can get list of avalible streamers with **GetStreamers**. Then you can create streamer using **CreateStreamer** and it will return instance id of newly created streamer. This will create streamer instance. You can get all streamer instances using **GetStreamerInstances**. You can destroy instance using **DestroyInstance** or to destroy all instances, call **DestroyInstances**.
-If you want to know more open server.py and you can see api in **StreamersHandler** class.
+First you should create streamer from list of avalible streamers. You can get list of avalible streamers with **GetStreamers**. 
+Then you can create streamer using **CreateStreamer** and it will return instance id of newly created streamer. 
+You can get all streamer instances using **GetStreamerInstances**. 
+You can destroy instance using **DestroyInstance** or to destroy all instances, call **DestroyInstances**.
 
-You can access any instance you created on uri "http://host:port/instance_id/". You can get streamer status using **GetStreamerStatus**, which returns list of status vars, like fps, time,... You can get streamer run status you can call **GetStreamerRunStatus**, which returns 0 for stopped, 1 for running, 2 for error, 3 for ended and 4 for unknown. Of course you can start streamer using **StartStreamer** and stop using **StopStreamer**. To get streamer value call **GetStreamerValue** and to set one call **SetStreamerValue**. The only usefull value right now is auto_restart set to one. This values gets also passed to your template.
+If you want to know more open server.py.
+
+You can access any instance you created on uri "http://host:port/instance_id/".
+You can get streamer status using **GetStreamerStatus**, which returns list of status vars, like fps, time,... 
+You can get streamer run status you can call **GetStreamerRunStatus**, which returns 0 for stopped, 1 for running, 2 for error, 3 for ended and 4 for unknown. 
+Of course you can start streamer using **StartStreamer** and stop using **StopStreamer**. 
+To get streamer value call **GetStreamerValue** and to set one call **SetStreamerValue**. 
+The only usefull value right now is auto_restart set to one. 
+This values gets also passed to templates.
+
+if you want to know more open streamer.py
 
 How to create new streamer template:
 ------------------------------------
