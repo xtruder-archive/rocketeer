@@ -11,6 +11,8 @@ It has xml-rpc interface, so you can create/start/stop stream remotely and set i
 
 Installation
 -----------
+**Current stable version is in branch pipa_stream3_0.5**
+
 This app works with python2.7, i didn't test with other python versions.
 
 - Install newest stable ffmpeg from git with whatever support you want.
