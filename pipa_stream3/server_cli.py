@@ -14,11 +14,19 @@ def main():
                       help="Ip where should i listen", dest="ip")
     parser.add_option("--port",
                       help="Port where should i bind", dest="port")
+    parser.add_option("--pid",
+                      help="Process pid", dest="pid")
     
     (options, args) = parser.parse_args()
 
     if options.daemon:
         ret= createDaemon()
+
+        if options.pid:
+            pid= os.getpid()
+            f= open(options.pid, "w")
+            f.write(str(pid))
+            f.close()
 
     if options.ip and options.port:
         srv= CreateServer(ip, port)
