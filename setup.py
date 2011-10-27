@@ -30,7 +30,8 @@ setup(
     entry_points="""
     [console_scripts]
     pstream3d= pipa_stream3.server_cli:main
-    pstream3_client= pipa_stream3.client_lirc:main
+    pstream3_client_lirc= pipa_stream3.client_lirc:main
+    pstream3_client= pipa_stream3.client:main
     """,
     package_data={'pipa_stream3': ['templates/*.tpl']},
 )

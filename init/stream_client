@@ -20,7 +20,7 @@
 
 NAME=pstream3_client
 PATH_BIN=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
-DAEMON=/usr/local/bin/pstream3_client
+DAEMON=/usr/local/bin/pstream3_client_lirc
 PIDFILE=/var/run/$NAME.pid
 DEFAULTS=/etc/default/$NAME
 DESC="pipa stream"
