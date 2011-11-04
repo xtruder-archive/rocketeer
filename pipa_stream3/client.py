@@ -1,5 +1,4 @@
 import xmlrpclib
-import pylirc
 
 from time import sleep
 from optparse import OptionParser
@@ -20,6 +19,12 @@ def main():
                       help="Instance for which to run command", dest="instance")
     (options, args) = parser.parse_args()
 
+    if not args:
+        print "No argument passed!"
+        return 0
+
+    print "Calling function", args[0]
+
     if options.ip and options.port:
         ip= options.ip
         port= options.port
@@ -30,9 +35,35 @@ def main():
     client = xmlrpclib.ServerProxy("http://%s:%s/" % (ip, port))
 
     if options.instance:
-        for (id,name) in client.GetStreamerInstances():
-            if  id==options.instance:
-                instance_client= xmlrpclib.ServerProxy("http://%s:%s/%s/" % (ip, port, str(options.instance))) 
+        print "... on instance", options.instance
+
+        instances= client.GetStreamerInstances()
+        for (id,name) in instances:
+            if  str(id)==str(options.instance):
+                instance_client= xmlrpclib.ServerProxy("http://%s:%s/%s" % (ip, port, str(options.instance)))
+
+                if args[0]=="help":
+                    print "Methods:", instance_client.system.listMethods()
+                else:
+                    if len(args)>1:
+                        if args[1]=="help":
+                            print "Help docs:\n", instance_client.system.methodHelp(args[0])
+                        else:
+                            print "Return:", getattr(instance_client,args[0])(*args[1:])
+                    else:
+                        print "Return:", getattr(instance_client,args[0])()
+    else:
+        if args[0]=="help":
+            print "Methods:", client.system.listMethods()
+        else:
+            if len(args)>1:
+                if args[1]=="help":
+                    print "Help docs:\n", client.system.methodHelp(args[0])
+                else:
+                    print "Return:", getattr(client,args[0])(*args[1:])
+            else:
+                print "Return:", getattr(client,args[0])()
+
 
 if __name__ == "__main__":
     main()

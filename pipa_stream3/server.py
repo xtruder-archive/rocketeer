@@ -63,6 +63,7 @@ class StreamersHandler(object):
 
     @synchronous("StreamerInstanceLock")
     def DestroyInstance(self, id):
+        id= int(id)
         if not self.instances.has_key(id):
             return False
         del(self.server.dispatchers["/"+str(id)])
