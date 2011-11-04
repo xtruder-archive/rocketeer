@@ -52,7 +52,7 @@ class TemplateCommand(Bootstrap):
 
 class ConfigTemplateTemplateCommand(TemplateCommand):
     def __init__(self, template, config_template, filename="", config_filename=""):
-        StaticCommand.__init__(self, template, filename)
+        TemplateCommand.__init__(self, template, filename)
 
         self.config_template= config_template
         self.config_filename= config_filename
@@ -61,16 +61,24 @@ class ConfigTemplateTemplateCommand(TemplateCommand):
         instance= self.config_template(self.values)
 
         f=NamedTemporaryFile(delete=False)
-        f.write(self._GenTemplate(self.config_filename, instance))
+        conf_template= self._GenTemplate(self.config_filename, instance)
+        #print conf_template
+        f.write(conf_template)
         f.close()
 
         self.config= f.name
 
         #We need to set for command generation.
-        self.values+= {"config": self.config}
+        self.values= dict(self.values.items()+{"config": self.config}.items())
 
     def PostStop(self):
-        os.unlink(self.config)
+        #must be able to handle multi calls
+        try: os.unlink(self.config)
+        except: pass
+
+    def _GenTemplate(self, filename, instance):
+        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+        return pystache.Template(FileIO(path).read(), instance).render()
 
 class Process(object):
     def __init__(self, bootstrap):
@@ -89,8 +97,9 @@ class Process(object):
         #It is used for auto restart.
         self.correctly_terminated= False
 
-    def _GetTemplateValues(self):
-        pass
+        #Determines if there was error druing
+        #process creation
+        self.error= False
 
     def Start(self):
         if self.isRunning():
@@ -99,14 +108,25 @@ class Process(object):
             self.started= False
             self.bootstrap.PostStop()
 
-        self.bootstrap.SetValues(self._GetTemplateValues())
+
+        self.error= False
+
+        self.bootstrap.SetValues(self.GetStreamerValues())
+        print "Calling PreStart"
+        self.bootstrap.PreStart()
         command= self.bootstrap.GetCommand()
         if isinstance(command, basestring):
             command= re.sub('[\\n\\t\\\\]+', '', command).split()
         print "Process command is", command
-        print "Calling PreStart"
-        self.bootstrap.PreStart()
-        self.process = subprocess.Popen(command, stderr = subprocess.PIPE, stdout = subprocess.PIPE )
+
+        try:
+            self.process = subprocess.Popen(command, stderr = subprocess.PIPE, stdout = subprocess.PIPE )
+        except:
+            print "Problem creating process"
+            self.error= True
+            self.Kill()
+            return
+
         self._setNonBlocking()
         print "Process created"
 
@@ -133,7 +153,8 @@ class Process(object):
             self.process.terminate()
             self.process.wait()
         except:
-            pass
+            self.Kill()
+            return
 
         #Determines that process was terminated by us.
         self.correctly_terminated= True
@@ -144,7 +165,8 @@ class Process(object):
             self.process.kill()
             self.process.wait()
         except:
-            pass
+            self.bootstrap.PostStop()
+            return
 
         #Determines that process was terminated by us.
         self.correctly_terminated= True
@@ -177,6 +199,8 @@ class StatusUpdateProcess(Process):
         if not self.isRunning():
             if self.started:
                 self._SetStreamerRunStatus(StreamerStatus.ENDED)
+            elif self.error:
+                self._SetStreamerRunStatus(StreamerStatus.ERROR)
             else:
                 self._SetStreamerRunStatus(StreamerStatus.STOPPED)
             return None

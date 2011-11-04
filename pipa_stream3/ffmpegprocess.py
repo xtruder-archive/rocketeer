@@ -10,9 +10,6 @@ class FFMpegProcess(StatusUpdateProcess, StreamerProcess):
 
         self.updateTime= time.time() # For knowing if something went wrong.
 
-    def _GetTemplateValues(self):
-        return self.GetStreamerValues()
-
     def UpdateStatus(self):
         if not StatusUpdateProcess.UpdateStatus(self):
             return None
