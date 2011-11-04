@@ -4,8 +4,10 @@ import fcntl
 import time
 import re
 import pystache
+import random
 
 from io import FileIO
+from tempfile import NamedTemporaryFile
 
 from streamer import StreamerStatus
 
@@ -58,15 +60,17 @@ class ConfigTemplateTemplateCommand(TemplateCommand):
     def PreStart(self):
         instance= self.config_template(self.values)
 
-        self.config= "/tmp/test.conf"
-        f=open(self.config, "w")
+        f=NamedTemporaryFile(delete=False)
         f.write(self._GenTemplate(self.config_filename, instance))
         f.close()
 
+        self.config= f.name
+
+        #We need to set for command generation.
         self.values+= {"config": self.config}
 
     def PostStop(self):
-        os.remove(self.config)
+        os.unlink(self.config)
 
 class Process(object):
     def __init__(self, bootstrap):
