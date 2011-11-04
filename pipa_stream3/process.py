@@ -7,10 +7,70 @@ import pystache
 
 from io import FileIO
 
-class Process(object):
-    def __init__(self,command="", template=False):
+from streamer import StreamerStatus
+
+class Bootstrap(object):
+    values=[]
+
+    def SetValues(self, values):
+        self.values= values
+
+    def GetCommand(self):
+        pass
+
+    def PreStart(self):
+        pass
+
+    def PostStop(self):
+        pass
+
+class StaticCommand(Bootstrap):
+    def __init__(self, command):
         self.command= command
+
+    def GetCommand():
+        return self.command
+
+class TemplateCommand(Bootstrap):
+    def __init__(self, template, filename=""):
         self.template= template
+        self.filename= filename
+
+    def GetCommand(self):
+        print "template",self.template
+        print self.values
+
+        instance= self.template(self.values)
+        return self._GenTemplate(self.filename, instance)
+
+    def _GenTemplate(self, filename, instance):
+        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+        txt= pystache.Template(FileIO(path).read(), instance).render()
+        return re.sub('[\\n\\t\\\\]+', '', txt).split()
+
+class ConfigTemplateTemplateCommand(TemplateCommand):
+    def __init__(self, template, config_template, filename="", config_filename=""):
+        StaticCommand.__init__(self, template, filename)
+
+        self.config_template= config_template
+        self.config_filename= config_filename
+
+    def PreStart(self):
+        instance= self.config_template(self.values)
+
+        self.config= "/tmp/test.conf"
+        f=open(self.config, "w")
+        f.write(self._GenTemplate(self.config_filename, instance))
+        f.close()
+
+        self.values+= {"config": self.config}
+
+    def PostStop(self):
+        os.remove(self.config)
+
+class Process(object):
+    def __init__(self, bootstrap):
+        self.bootstrap= bootstrap
 
         #Determines if process has been started.
         #It is used for determing if process was
@@ -28,31 +88,20 @@ class Process(object):
     def _GetTemplateValues(self):
         pass
 
-    def _GenCommand(self):
-        if self.template:
-            print "template",self.template
-            print self._GetTemplateValues()
-
-            instance= self.template(self._GetTemplateValues())
-            return self._GenTemplate(self.filename, instance)
-        else:
-            return self.command
-
-    def _GenTemplate(self, filename, instance):
-        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
-        txt= pystache.Template(FileIO(path).read(), instance).render()
-        return re.sub('[\\n\\t\\\\]+', '', txt).split()
-
     def Start(self):
         if self.isRunning():
             self.Terminate()
         if self.started:
             self.started= False
+            self.bootstrap.PostStop()
 
-        command= self._GenCommand()
+        self.bootstrap.SetValues(self._GetTemplateValues())
+        command= self.bootstrap.GetCommand()
         if isinstance(command, basestring):
             command= re.sub('[\\n\\t\\\\]+', '', command).split()
         print "Process command is", command
+        print "Calling PreStart"
+        self.bootstrap.PreStart()
         self.process = subprocess.Popen(command, stderr = subprocess.PIPE, stdout = subprocess.PIPE )
         self._setNonBlocking()
         print "Process created"
@@ -82,8 +131,9 @@ class Process(object):
         except:
             pass
 
-        #Determines if process was terminated by us.
+        #Determines that process was terminated by us.
         self.correctly_terminated= True
+        self.bootstrap.PostStop()
 
     def Kill(self):
         try:
@@ -92,8 +142,9 @@ class Process(object):
         except:
             pass
 
-        #Determines if process was terminated by us.
+        #Determines that process was terminated by us.
         self.correctly_terminated= True
+        self.bootstrap.PostStop()
 
     def ReadLine(self):
         line = ""
@@ -115,8 +166,8 @@ class Process(object):
             lines+= [line]
 
 class StatusUpdateProcess(Process):
-    def __init__(self, command="", template=False):
-        Process.__init__(self, command, template)
+    def __init__(self, bootstrap):
+        Process.__init__(self, bootstrap)
 
     def UpdateStatus(self):
         if not self.isRunning():

@@ -1,5 +1,6 @@
 from time import sleep
 
+from process import TemplateCommand
 from ffmpegprocess import FFMpegProcess
 from server import Server, StreamersHandler
 
@@ -10,23 +11,19 @@ from templates.stream_test import testTpl
 
 class h264Stream(FFMpegProcess):
     def __init__(self):
-        FFMpegProcess.__init__(self,template=h264Tpl)
-        self.filename= "templates/stream_h264.tpl"
+        FFMpegProcess.__init__(self,bootstrap=TemplateCommand(h264Tpl, "templates/stream_h264.tpl"))
 
 class webmStream(FFMpegProcess):
     def __init__(self):
-        FFMpegProcess.__init__(self,template=webmTpl)
-        self.filename= "templates/stream_webm.tpl"
+        FFMpegProcess.__init__(self,bootstrap=TemplateCommand(webmTpl, "templates/stream_webm.tpl"))
 
 class prosojniceStream(FFMpegProcess):
     def __init__(self):
-        FFMpegProcess.__init__(self,template=prosojniceTpl)
-        self.filename= "templates/stream_prosojnice.tpl"
+        FFMpegProcess.__init__(self,bootstrap=TemplateCommand(prosojniceTpl, "templates/stream_prosojnice.tpl"))
 
 class testStream(FFMpegProcess):
     def __init__(self):
-        FFMpegProcess.__init__(self,template=testTpl)
-        self.filename= "templates/stream_test.tpl"
+        FFMpegProcess.__init__(self,bootstrap=TemplateCommand(testTpl, "templates/stream_test.tpl"))
 
 def CreateServer(ip="127.0.0.1", port=8400):
     srv= Server(StreamersHandler, ip, port)

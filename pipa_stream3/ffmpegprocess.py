@@ -4,9 +4,9 @@ from streamer import StreamerProcess, StreamerStatus
 from process import StatusUpdateProcess
 
 class FFMpegProcess(StatusUpdateProcess, StreamerProcess):
-    def __init__(self, command="", template=False):
-        StatusUpdateProcess.__init__(self, command, template)
-        StreamerProcess.__init__(self, template)
+    def __init__(self, bootstrap):
+        StatusUpdateProcess.__init__(self, bootstrap)
+        StreamerProcess.__init__(self)
 
         self.updateTime= time.time() # For knowing if something went wrong.
 

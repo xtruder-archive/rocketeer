@@ -68,9 +68,8 @@ class Streamer(object):
         pass
 
 class StreamerProcess(Streamer): #, Process):
-    def __init__(self, template=False):
+    def __init__(self):
         Streamer.__init__(self)
-        self.template= template
 
     @synchronous("StreamerLock")
     def StartStreamer(self):
