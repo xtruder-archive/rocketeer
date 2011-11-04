@@ -26,7 +26,7 @@ setup_mode off
 
 # Videodevice to be used for capturing  (default /dev/video0)
 # for FreeBSD default is /dev/bktr0
-videodevice /dev/video1
+videodevice /dev/video0
 
 # v4l2_palette allows to choose preferable palette to be use by motion
 # to capture from those supported by your videodevice. (default: 8)
@@ -67,14 +67,14 @@ frequency 0
 rotate 0
 
 # Image width (pixels). Valid range: Camera dependent, default: 352
-width 768
+width 640
 
 # Image height (pixels). Valid range: Camera dependent, default: 288
-height 576
+height 480
 
 # Maximum number of frames to be captured per second.
 # Valid range: 2-100. Default: 100 (almost no limit).
-framerate 2
+framerate 5
 
 # Minimum time in seconds between capturing picture frames from the camera.
 # Default: 0 = disabled - the capture rate is given by the camera framerate.
@@ -150,16 +150,16 @@ switchfilter off
 
 # Threshold for number of changed pixels in an image that
 # triggers motion detection (default: 1500)
-threshold 10000
+threshold 500
 
 # Automatically tune the threshold down if possible (default: off)
-threshold_tune off
+threshold_tune on
 
 # Noise threshold for the motion detection (default: 32)
-noise_level 32
+noise_level 70
 
 # Automatically tune the noise threshold (default: on)
-noise_tune off
+noise_tune on
 
 # Despeckle motion image using (e)rode or (d)ilate or (l)abel (Default: not defined)
 # Recommended value is EedDl. Any combination (and number of) of E, e, d, and D is valid.

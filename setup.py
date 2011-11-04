@@ -26,7 +26,7 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
-    install_requires = [ "pystache", "pylirc2" ],
+    install_requires = [ "pystache", "pylirc2", "paramiko", "pyinotify" ],
     entry_points="""
     [console_scripts]
     pstream3d= pipa_stream3.server_cli:main

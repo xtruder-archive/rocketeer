@@ -3,6 +3,7 @@ from time import sleep
 from process import TemplateCommand, ConfigTemplateTemplateCommand
 from ffmpegprocess import FFMpegProcess
 from staticprocess import StaticProcess
+from notifycopyprocess import NotifyCopyProcess
 from server import Server, StreamersHandler
 
 from templates.stream_h264 import h264Tpl
@@ -41,6 +42,7 @@ def CreateServer(ip="127.0.0.1", port=8400):
     streamersHandler.RegisterStreamer(prosojniceStream)
     streamersHandler.RegisterStreamer(motionDetect)
     streamersHandler.RegisterStreamer(testStream)
+    streamersHandler.RegisterStreamer(NotifyCopyProcess)
     srv.start()
 
     return srv

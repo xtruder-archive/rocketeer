@@ -15,4 +15,4 @@ class StaticProcess(StatusUpdateProcess, StreamerProcess):
         print("running")
         self._SetStreamerRunStatus(StreamerStatus.RUNNING)
 
-        return result
+        return ""

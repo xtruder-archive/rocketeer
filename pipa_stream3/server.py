@@ -7,7 +7,7 @@ from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, Si
 
 from synch import synchronous
 
-from process import StatusUpdateProcess
+from process import StatusUpdateNode
 from streamer import StreamerStatus
 
 class StreamersHandler(object):
@@ -83,7 +83,8 @@ class StreamersHandler(object):
         for key in self.instances:
             instance= self.instances[key][0]
             if isinstance(instance,
-                    StatusUpdateProcess):
+                    StatusUpdateNode):
+
                 instance.UpdateStatus()
                 #Auto close
                 if( self.auto_close and

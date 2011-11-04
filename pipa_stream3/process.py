@@ -191,7 +191,15 @@ class Process(object):
                 return lines
             lines+= [line]
 
-class StatusUpdateProcess(Process):
+class StatusUpdateNode(object):
+    error= False
+    def UpdateStatus(self):
+	if self.error:
+	    self._SetStreamerRunStatus(StreamerStatus.ERROR)
+	    return None
+        return True
+
+class StatusUpdateProcess(Process, StatusUpdateNode):
     def __init__(self, bootstrap):
         Process.__init__(self, bootstrap)
 
