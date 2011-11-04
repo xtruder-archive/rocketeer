@@ -7,23 +7,15 @@ class FFMpegProcess(StatusUpdateProcess, StreamerProcess):
     def __init__(self, command="", template=False):
         StatusUpdateProcess.__init__(self, command, template)
         StreamerProcess.__init__(self, template)
-        
-        self.lastStatus= None
-        self.updateTime= time.time() # For knowing that something went wrong.
-        self.started= False
+
+        self.updateTime= time.time() # For knowing if something went wrong.
 
     def _GetTemplateValues(self):
         return self.GetStreamerValues()
 
     def UpdateStatus(self):
-        if not self.isRunning():
-            if self.started:
-                self._SetStreamerRunStatus(StreamerStatus.ENDED)
-            else:
-                self._SetStreamerRunStatus(StreamerStatus.STOPPED)
+        if not StatusUpdateProcess.UpdateStatus(self):
             return None
-
-        self.started= True
 
         lines= self.ReadLines()
         result= self._ParseStatus(lines)

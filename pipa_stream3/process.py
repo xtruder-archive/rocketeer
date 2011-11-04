@@ -11,10 +11,18 @@ class Process(object):
     def __init__(self,command="", template=False):
         self.command= command
         self.template= template
+
+        #Determines if process has been started.
+        #It is used for determing if process was
+        #stopped by itself or if it hasn't been
+        #yet launched.
         self.started= False
 
-        #Flag if process was correctly terminated
-        #Only set if we call terminate or kill
+        #Flag if process was correctly terminated.
+        #Only set if we call terminate or kill,
+        #and determines if process was terminated
+        #by us or by itself.
+        #It is used for auto restart.
         self.correctly_terminated= False
 
     def _GetTemplateValues(self):
@@ -49,6 +57,7 @@ class Process(object):
         self._setNonBlocking()
         print "Process created"
 
+        #Determines if process was determined by us.
         self.correctly_terminated= False
 
     def _setNonBlocking(self):
@@ -73,6 +82,7 @@ class Process(object):
         except:
             pass
 
+        #Determines if process was terminated by us.
         self.correctly_terminated= True
 
     def Kill(self):
@@ -82,6 +92,7 @@ class Process(object):
         except:
             pass
 
+        #Determines if process was terminated by us.
         self.correctly_terminated= True
 
     def ReadLine(self):
@@ -107,7 +118,16 @@ class StatusUpdateProcess(Process):
     def __init__(self, command="", template=False):
         Process.__init__(self, command, template)
 
-    def UpdateStatus(Process):
-        pass
+    def UpdateStatus(self):
+        if not self.isRunning():
+            if self.started:
+                self._SetStreamerRunStatus(StreamerStatus.ENDED)
+            else:
+                self._SetStreamerRunStatus(StreamerStatus.STOPPED)
+            return None
+
+        #Needed for auto restart.
+        self.started= True
+        return True
 
 
