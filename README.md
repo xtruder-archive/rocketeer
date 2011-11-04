@@ -28,7 +28,8 @@ Usage:
 There are two cli commands(add --help for more info):
 
 - pstream3d - xml-rpc app server.
-- pstream3_client - lirc client for server.
+- pstream3_client - command line client for server.
+- pstream3_client_lirc - lirc client for server.
 
 API:
 ----

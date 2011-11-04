@@ -7,7 +7,7 @@ from daemon import createDaemon
 from streamer import StreamerStatus
 
 def main():
-    usage = "usage: pstream3_client [options] command [arg1,arg2,...]"
+    usage = "usage: pstream3_client [options] command [arg1,arg2,...] [help]"
     parser = OptionParser(usage)
     parser.add_option("--daemon",
                       help="Run me as daemon", action="store_true", dest="daemon")
