@@ -11,14 +11,14 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "rocketeer",
-    version = "0.5",
-    author = "Kiberpipa",
-    author_email = "jakahudoklin@gmail.com",
-    description = ("Advanced remote process launcher and manager."),
+    name = "sample_project",
+    version = "0.1",
+    author = "author",
+    author_email = "sample@email",
+    description = ("Description"),
     license = "GNU",
-    keywords = "process launcher remote ffmpeg",
-    url = "https://github.com/offlinehacker/rocketeer",
+    keywords = "rocketeer sample project",
+    url = "url",
     packages=find_packages(),
     long_description=read('README.md'),
     classifiers=[
@@ -26,6 +26,6 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
-    install_requires = [ "pystache", "pylirc2", "paramiko", "pyinotify" ],
-    package_data={'rocketeer': ['templates/*.tpl']},
+    install_requires = [ "rocketeer" ],
+    package_data={'sample_project': ['templates/*.tpl']},
 )

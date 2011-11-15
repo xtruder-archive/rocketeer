@@ -1,18 +1,12 @@
-PIPA STREAM 3rd GENERATION
-==========================
+ROCKETEER - Advanced app launcher and manager
+=============================================
 
 Description
 -----------
-This app let's you start your streams remotely.
-It is actually very smart process launcher, specialized for starting
-processes that provide statuses(like ffmpeg). Currently it has only
-ability to parse statuses of ffmpeg processes, but it's very easy to extend.
-It has xml-rpc interface, so you can create/start/stop stream remotely and set its parameters.
+Rocketeer is very smart process launcher, watchdog and manager. It has abilty to start user commands from templates, to which you can pass parameters, to controle those processes and parse statuses. The main power is remote xml-rpc interface.
 
 Installation
 -----------
-**Current stable version is in branch pipa_stream3_0.5**
-
 This app works with python2.7, i didn't test with other python versions.
 
 - Install newest stable ffmpeg from git with whatever support you want.
@@ -67,10 +61,10 @@ TODO:
 
 License:
 --------
-Pipa_stream3 is Copyright (C) 2011 kiberpipa.
+Rocketeer is Copyright (C) 2011 Jaka Hudoklin.
 
-Pipa_stream3 is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2 as published by the Free Software Foundation.
+Rocketeer is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2 as published by the Free Software Foundation.
 
-Pipa_stream3 is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Rocketeer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
