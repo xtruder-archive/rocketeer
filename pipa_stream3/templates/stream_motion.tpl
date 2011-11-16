@@ -1,1 +1,0 @@
-motion -c {{config}}

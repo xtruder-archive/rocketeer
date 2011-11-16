@@ -8,43 +8,43 @@ from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, Si
 from synch import synchronous
 
 from process import StatusUpdateNode
-from streamer import StreamerStatus
+from app import AppStatus
 
-class StreamersHandler(object):
+class AppsHandler(object):
     def __init__(self, server, auto_close= False):
         self.server= server
 
-        self.streamers= {}
+        self.Apps= {}
         self.instances= {}
 
         self.auto_close= auto_close
 
-        self.StreamerRegisterLock= threading.RLock()
-        self.StreamerInstanceLock= threading.RLock()
+        self.AppRegisterLock= threading.RLock()
+        self.AppInstanceLock= threading.RLock()
 
-    @synchronous("StreamerRegisterLock")
-    def RegisterStreamer(self, streamer, name=""):
-        if not streamer:
-            raise Exception("Cannot register streamer!")
+    @synchronous("AppRegisterLock")
+    def RegisterApp(self, App, name=""):
+        if not App:
+            raise Exception("Cannot register App!")
 
         if not name:
-            name=streamer.__name__
+            name=App.__name__
 
-        self.streamers[name]= streamer
+        self.Apps[name]= App
 
-    @synchronous("StreamerRegisterLock")
-    def GetStreamers(self):
+    @synchronous("AppRegisterLock")
+    def GetApps(self):
         print "here"
-        return self.streamers.keys()
+        return self.Apps.keys()
 
-#    @synchronous("StreamerRegisterLock")
-    @synchronous("StreamerInstanceLock")
-    def CreateStreamer(self, name):
-        if name not in self.streamers:
+#    @synchronous("AppRegisterLock")
+    @synchronous("AppInstanceLock")
+    def CreateApp(self, name):
+        if name not in self.Apps:
             return 0
 
         id= random.getrandbits(16)
-        self.instances[id]= (self.streamers[name](), name)
+        self.instances[id]= (self.Apps[name](), name)
 
         dispatcher= SimpleXMLRPCDispatcher()
         dispatcher.register_introspection_functions()
@@ -53,15 +53,15 @@ class StreamersHandler(object):
 
         return id
 
-    @synchronous("StreamerInstanceLock")
-    def GetStreamerInstances(self):
+    @synchronous("AppInstanceLock")
+    def GetAppInstances(self):
         ret=()
         for id in self.instances.keys():
             ret+= ((id, self.instances[id][1]),)
 
         return ret
 
-    @synchronous("StreamerInstanceLock")
+    @synchronous("AppInstanceLock")
     def DestroyInstance(self, id):
         id= int(id)
         if not self.instances.has_key(id):
@@ -72,12 +72,12 @@ class StreamersHandler(object):
 
         return True
 
-    @synchronous("StreamerInstanceLock")
+    @synchronous("AppInstanceLock")
     def DestroyInstances(self):
         for id in self.instances.keys():
             self.DestroyInstance(id)
 
-    @synchronous("StreamerInstanceLock")
+    @synchronous("AppInstanceLock")
     def UpdateStatus(self):
         delete=[] # Auto close objects
         for key in self.instances:
@@ -88,13 +88,13 @@ class StreamersHandler(object):
                 instance.UpdateStatus()
                 #Auto close
                 if( self.auto_close and
-                    instance.GetStreamerRunStatus()==StreamerStatus.ENDED):
+                    instance.GetAppRunStatus()==AppStatus.ENDED):
                     delete+=[instance]
                 #Auto restart
-                elif( (instance.GetStreamerRunStatus()==StreamerStatus.ENDED or \
-                      instance.GetStreamerRunStatus()==StreamerStatus.ERROR) and \
-                        instance.GetStreamerValue("auto_restart") and not instance.correctly_terminated ) :
-                    instance.StartStreamer()
+                elif( (instance.GetAppRunStatus()==AppStatus.ENDED or \
+                      instance.GetAppRunStatus()==AppStatus.ERROR) and \
+                        instance.GetAppValue("auto_restart") and not instance.correctly_terminated ) :
+                    instance.StartApp()
 
         for instance in delete:
             instance.__del__()

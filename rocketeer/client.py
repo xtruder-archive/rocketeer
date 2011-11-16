@@ -4,7 +4,7 @@ from time import sleep
 from optparse import OptionParser
 
 from daemon import createDaemon
-from streamer import StreamerStatus
+from app import AppStatus
 
 def main():
     usage = "usage: pstream3_client [options] command [arg1,arg2,...] [help]"
@@ -37,7 +37,7 @@ def main():
     if options.instance:
         print "... on instance", options.instance
 
-        instances= client.GetStreamerInstances()
+        instances= client.GetAppInstances()
         for (id,name) in instances:
             if  str(id)==str(options.instance):
                 instance_client= xmlrpclib.ServerProxy("http://%s:%s/%s" % (ip, port, str(options.instance)))

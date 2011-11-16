@@ -1,15 +1,13 @@
 import os
 import subprocess
 import fcntl
-import time
 import re
 import pystache
-import random
 
 from io import FileIO
 from tempfile import NamedTemporaryFile
 
-from streamer import StreamerStatus
+from app import AppStatus
 
 class Bootstrap(object):
     values=[]
@@ -30,7 +28,7 @@ class StaticCommand(Bootstrap):
     def __init__(self, command):
         self.command= command
 
-    def GetCommand():
+    def GetCommand(self):
         return self.command
 
 class TemplateCommand(Bootstrap):
@@ -111,7 +109,7 @@ class Process(object):
 
         self.error= False
 
-        self.bootstrap.SetValues(self.GetStreamerValues())
+        self.bootstrap.SetValues(self.GetAppValues())
         print "Calling PreStart"
         self.bootstrap.PreStart()
         command= self.bootstrap.GetCommand()
@@ -194,10 +192,10 @@ class Process(object):
 class StatusUpdateNode(object):
     error= False
     def UpdateStatus(self):
-	if self.error:
-	    self._SetStreamerRunStatus(StreamerStatus.ERROR)
-	    return None
-        return True
+        if self.error:
+            self._SetAppRunStatus(AppStatus.ERROR)
+            return None
+    return True
 
 class StatusUpdateProcess(Process, StatusUpdateNode):
     def __init__(self, bootstrap):
@@ -206,11 +204,11 @@ class StatusUpdateProcess(Process, StatusUpdateNode):
     def UpdateStatus(self):
         if not self.isRunning():
             if self.started:
-                self._SetStreamerRunStatus(StreamerStatus.ENDED)
+                self._SetAppRunStatus(AppStatus.ENDED)
             elif self.error:
-                self._SetStreamerRunStatus(StreamerStatus.ERROR)
+                self._SetAppRunStatus(AppStatus.ERROR)
             else:
-                self._SetStreamerRunStatus(StreamerStatus.STOPPED)
+                self._SetAppRunStatus(AppStatus.STOPPED)
             return None
 
         #Needed for auto restart.

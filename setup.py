@@ -13,9 +13,9 @@ def read(fname):
 setup(
     name = "rocketeer",
     version = "0.5",
-    author = "Kiberpipa",
+    author = "Jaka Hudoklin",
     author_email = "jakahudoklin@gmail.com",
-    description = ("Advanced remote process launcher and manager."),
+    description = ("Advanced remote process launcher, watchdog and manager."),
     license = "GNU",
     keywords = "process launcher remote ffmpeg",
     url = "https://github.com/offlinehacker/rocketeer",
@@ -26,6 +26,5 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
-    install_requires = [ "pystache", "pylirc2", "paramiko", "pyinotify" ],
-    package_data={'rocketeer': ['templates/*.tpl']},
+    install_requires = [ "pystache" ],
 )

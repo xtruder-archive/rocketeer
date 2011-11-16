@@ -1,18 +1,16 @@
-import time
-
-from streamer import StreamerProcess, StreamerStatus
+from app import AppProcess, AppStatus
 from process import StatusUpdateProcess
 
-class StaticProcess(StatusUpdateProcess, StreamerProcess):
+class StaticProcess(StatusUpdateProcess, AppProcess):
     def __init__(self, bootstrap):
         StatusUpdateProcess.__init__(self, bootstrap)
-        StreamerProcess.__init__(self)
+        AppProcess.__init__(self)
 
     def UpdateStatus(self):
         if not StatusUpdateProcess.UpdateStatus(self):
             return None
 
         print("running")
-        self._SetStreamerRunStatus(StreamerStatus.RUNNING)
+        self._SetAppRunStatus(AppStatus.RUNNING)
 
         return ""

@@ -3,7 +3,7 @@ ROCKETEER - Advanced app launcher and manager
 
 Description
 -----------
-Rocketeer is very smart process launcher, watchdog and manager. It has abilty to start user commands from templates, to which you can pass parameters, to controle those processes and parse statuses. The main power is remote xml-rpc interface.
+Rocketeer is very smart remote process launcher, watchdog and manager. It has abilty to start user commands from templates, to which you can pass parameters, to controle those processes and parse statuses. The main power is remote xml-rpc interface.
 
 Installation
 -----------
@@ -12,10 +12,6 @@ This app works with python2.7, i didn't test with other python versions.
 - Install newest stable ffmpeg from git with whatever support you want.
 - Install liblirc if you want to control streams with your remote.
 - python setup.py install
-- if you want to start on system startup there are init script avalible in init
-  folder and sample config in config folder.
-- Copy init scripts to /etc/init.d/
-- Copy config files to /etc/pstream/
 
 Usage:
 ------
@@ -31,28 +27,28 @@ Interface is xml-rpc on whatever port and host you set to daemon.
 
 You can access it on url "http://host:port/"
 
-First you should create streamer from list of avalible streamers. You can get list of avalible streamers with **GetStreamers**. 
-Then you can create streamer using **CreateStreamer** and it will return instance id of newly created streamer. 
-You can get all streamer instances using **GetStreamerInstances**. 
+First you should create app from list of avalible apps. You can get list of avalible apps with **GetApps**. 
+Then you can create app using **CreateApp** and it will return instance id of newly created app. 
+You can get all app instances using **GetAppInstances**. 
 You can destroy instance using **DestroyInstance** or to destroy all instances, call **DestroyInstances**.
 
 If you want to know more open server.py.
 
 You can access any instance you created on uri "http://host:port/instance_id/".
-You can get streamer status using **GetStreamerStatus**, which returns list of status vars, like fps, time,... 
-You can get streamer run status you can call **GetStreamerRunStatus**, which returns 0 for stopped, 1 for running, 2 for error, 3 for ended and 4 for unknown. 
-Of course you can start streamer using **StartStreamer** and stop using **StopStreamer**. 
-To get streamer value call **GetStreamerValue** and to set one call **SetStreamerValue**. 
+You can get app status using **GetAppStatus**, which returns list of status vars, like fps, time,... 
+You can get app run status you can call **GetAppRunStatus**, which returns 0 for stopped, 1 for running, 2 for error, 3 for ended and 4 for unknown. 
+Of course you can start app using **StartApp** and stop using **StopApp**. 
+To get app value call **GetAppValue** and to set one call **SetAppValue**. 
 The only usefull value right now is auto_restart set to one. 
 This values gets also passed to templates.
 
-if you want to know more open streamer.py
+if you want to know more open app.py
 
-How to create new streamer template:
+How to create new app template:
 ------------------------------------
-Go to templates folder and you can see sample_template.py and sample_template.tpl. In your py file you define what varibales get passed to template, and in tpl file is template. It is based on mustache templating engine. You must remember that __init__ function of template gets values you set using SetStreamerValue as key value.
+Go to templates folder and you can see sample_template.py and sample_template.tpl. In your py file you define what varibales get passed to template, and in tpl file is template. It is based on mustache templating engine. You must remember that __init__ function of template gets values you set using SetAppValue as key value.
 
-You must also register your newly created streamer in server.py, using RegisterStreamer.
+You must also register your newly created app in server.py, using RegisterApp.
 
 TODO:
 -----
