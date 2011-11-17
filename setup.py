@@ -12,7 +12,7 @@ def read(fname):
 
 setup(
     name = "rocketeer",
-    version = "0.5",
+    version = "0.2",
     author = "Jaka Hudoklin",
     author_email = "jakahudoklin@gmail.com",
     description = ("Advanced remote process launcher, watchdog and manager."),

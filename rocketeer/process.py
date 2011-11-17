@@ -195,7 +195,7 @@ class StatusUpdateNode(object):
         if self.error:
             self._SetAppRunStatus(AppStatus.ERROR)
             return None
-    return True
+        return True
 
 class StatusUpdateProcess(Process, StatusUpdateNode):
     def __init__(self, bootstrap):
