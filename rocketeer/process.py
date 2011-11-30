@@ -3,6 +3,7 @@ import subprocess
 import fcntl
 import re
 import pystache
+import inspect
 
 from io import FileIO
 from tempfile import NamedTemporaryFile
@@ -44,7 +45,8 @@ class TemplateCommand(Bootstrap):
         return self._GenTemplate(self.filename, instance)
 
     def _GenTemplate(self, filename, instance):
-        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+	print inspect.getfile(self.template)
+        path=os.path.join(os.path.dirname(inspect.getfile(self.template)), filename)
         txt= pystache.Template(FileIO(path).read(), instance).render()
         return re.sub('[\\n\\t\\\\]+', '', txt).split()
 
@@ -75,7 +77,7 @@ class ConfigTemplateTemplateCommand(TemplateCommand):
         except: pass
 
     def _GenTemplate(self, filename, instance):
-        path=os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
+        path=os.path.join(os.path.dirname(inspect.getfile(self.template)), filename)
         return pystache.Template(FileIO(path).read(), instance).render()
 
 class Process(object):

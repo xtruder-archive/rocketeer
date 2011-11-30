@@ -18,8 +18,14 @@ class App(object):
         self.AppLock= threading.RLock()
         self.values= {}
 
+        self.watchdogs= {}
+	self.watchdog_instances= {}
+
     def __del__(self):
         self.StopApp()
+
+    def _RegisterAppWatchdog(self, watchdog):
+        self.watchdogs.append(watchdog)
 
     @synchronous("AppLock")
     def GetAppRunStatus(self):
@@ -61,10 +67,24 @@ class App(object):
 
     @synchronous("AppLock")
     def StartApp(self):
-        pass
+        for watchdog in self.watchdogs:
+            self.watchdog_instances.append(watchdog(self))
 
     @synchronous("AppLock")
     def StopApp(self):
+        for watchdog in self.watchdog_instances:
+	    watchdog.__del__()
+
+	self.watchdog_instances= {}
+
+    def _GetWatchdogStatus(self):
+        for watchdog in self.watchdog_instances:
+            if watchdog.GetRunningStatus()==AppStatus.ERROR:
+                return False
+
+        return True
+
+    def _UpdateAppStatus(self):
         pass
 
 class AppProcess(App): #, Process):
@@ -73,12 +93,23 @@ class AppProcess(App): #, Process):
 
     @synchronous("AppLock")
     def StartApp(self):
+        App.StartApp(self)
+
         self._SetAppRunStatus(AppStatus.UNKNOWN)
         self.Start() # We can do that in python :)
         return 1
 
     @synchronous("AppLock")
     def StopApp(self):
+	App.StopApp(self)
+
         print("Stopping process")
         self.Terminate() # We can do that in python :)
         return 1
+
+    @synchronous("AppLock")
+    def _UpdateAppStatus(self):
+	self.UpdateStatus()
+
+        if self._GetWatchdogStatus()==False:
+             self._SetAppRunStatus(AppStatus.ENDED)
