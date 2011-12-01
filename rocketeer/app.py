@@ -19,7 +19,6 @@ class App(object):
         self.values= {}
 
         self.watchdogs= {}
-	self.watchdog_instances= {}
 
     def __del__(self):
         self.StopApp()
@@ -68,24 +67,25 @@ class App(object):
     @synchronous("AppLock")
     def StartApp(self):
         for watchdog in self.watchdogs:
-            self.watchdog_instances.append(watchdog(self))
+            self.watchdog.StartWatchdog()
 
     @synchronous("AppLock")
     def StopApp(self):
-        for watchdog in self.watchdog_instances:
-	    watchdog.__del__()
+        for watchdog in self.watchdogs:
+	    watchdog.StopWatchdog()
 
 	self.watchdog_instances= {}
 
     def _GetWatchdogStatus(self):
         for watchdog in self.watchdog_instances:
-            if watchdog.GetRunningStatus()==AppStatus.ERROR:
+            if watchdog.GetRunningStatus()==False:
                 return False
 
         return True
 
     def _UpdateAppStatus(self):
-        pass
+        if self._GetWatchdogStatus()==False:
+            self._SetAppRunStatus(AppStatus.ENDED)
 
 class AppProcess(App): #, Process):
     def __init__(self):
@@ -110,6 +110,4 @@ class AppProcess(App): #, Process):
     @synchronous("AppLock")
     def _UpdateAppStatus(self):
 	self.UpdateStatus()
-
-        if self._GetWatchdogStatus()==False:
-             self._SetAppRunStatus(AppStatus.ENDED)
+        App._UpdateAppStatus(self)

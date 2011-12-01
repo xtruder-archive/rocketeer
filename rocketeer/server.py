@@ -85,7 +85,7 @@ class AppsHandler(object):
             if isinstance(instance,
                     StatusUpdateNode):
 
-                instance.UpdateStatus()
+                instance._UpdateAppStatus()
                 #Auto close
                 if( self.auto_close and
                     instance.GetAppRunStatus()==AppStatus.ENDED):
