@@ -11,6 +11,10 @@ from process import StatusUpdateNode
 from app import AppStatus
 
 class AppsHandler(object):
+    """
+    Request handler for apps.
+    """ 
+
     def __init__(self, server, auto_close= False):
         self.server= server
 
@@ -34,7 +38,6 @@ class AppsHandler(object):
 
     @synchronous("AppRegisterLock")
     def GetApps(self):
-        print "here"
         return self.Apps.keys()
 
 #    @synchronous("AppRegisterLock")
@@ -86,15 +89,19 @@ class AppsHandler(object):
                     StatusUpdateNode):
 
                 instance._UpdateAppStatus()
-                #Auto close
+                # Auto close
                 if( self.auto_close and
                     instance.GetAppRunStatus()==AppStatus.ENDED):
                     delete+=[instance]
-                #Auto restart
+                # Auto restart
                 elif( (instance.GetAppRunStatus()==AppStatus.ENDED or \
                       instance.GetAppRunStatus()==AppStatus.ERROR) and \
                         instance.GetAppValue("auto_restart") and not instance.correctly_terminated ) :
                     instance.StartApp()
+                # In case of error we have to stop app if it is already running.
+                elif( instance.GetAppRunStatus()==AppStatus.ERROR ):
+                    print "Stopping app"
+                    instance.StopApp()
 
         for instance in delete:
             instance.__del__()
