@@ -1,7 +1,10 @@
 from time import time
 
+from PyLogDecorate.log import LogCall, LogClass
+
 from watchdog import AppWatchdog
 
+@LogClass()
 class TimeWatchdog(AppWatchdog):
     def __init__(self, app, limit):
 	AppWatchdog.__init__(self, app)

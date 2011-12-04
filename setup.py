@@ -26,5 +26,5 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
-    install_requires = [ "pystache" ],
+    install_requires = [ "pystache", "PyLogDecorate" ],
 )

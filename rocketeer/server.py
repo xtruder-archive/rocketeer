@@ -2,6 +2,7 @@ import threading
 import copy
 import random
 
+from logging import INFO
 from threading import Thread
 from SimpleXMLRPCServer import MultiPathXMLRPCServer, SimpleXMLRPCDispatcher, SimpleXMLRPCRequestHandler
 
@@ -10,6 +11,9 @@ from synch import synchronous
 from process import StatusUpdateNode
 from app import AppStatus
 
+from PyLogDecorate.log import LogCall, LogClass
+
+@LogClass({"subdecorate": True})
 class AppsHandler(object):
     """
     Request handler for apps.
@@ -27,6 +31,7 @@ class AppsHandler(object):
         self.AppInstanceLock= threading.RLock()
 
     @synchronous("AppRegisterLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def RegisterApp(self, App, name=""):
         if not App:
             raise Exception("Cannot register App!")
@@ -37,11 +42,13 @@ class AppsHandler(object):
         self.Apps[name]= App
 
     @synchronous("AppRegisterLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def GetApps(self):
         return self.Apps.keys()
 
 #    @synchronous("AppRegisterLock")
     @synchronous("AppInstanceLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def CreateApp(self, name):
         if name not in self.Apps:
             return 0
@@ -57,6 +64,7 @@ class AppsHandler(object):
         return id
 
     @synchronous("AppInstanceLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def GetAppInstances(self):
         ret=()
         for id in self.instances.keys():
@@ -65,6 +73,7 @@ class AppsHandler(object):
         return ret
 
     @synchronous("AppInstanceLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def DestroyInstance(self, id):
         id= int(id)
         if not self.instances.has_key(id):
@@ -76,11 +85,13 @@ class AppsHandler(object):
         return True
 
     @synchronous("AppInstanceLock")
+    @LogCall({"subdecorate": True, "level": INFO})
     def DestroyInstances(self):
         for id in self.instances.keys():
             self.DestroyInstance(id)
 
     @synchronous("AppInstanceLock")
+    @LogCall({"subdecorate": True})
     def UpdateStatus(self):
         delete=[] # Auto close objects
         for key in self.instances:
@@ -111,7 +122,9 @@ class AppsHandler(object):
 class RHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = None
 
+@LogClass()
 class Server(Thread):
+    @LogCall()
     def __init__(self, requestHandler, host="localhost", port=8400):
         Thread.__init__(self)
 
@@ -122,9 +135,11 @@ class Server(Thread):
         self.dispatcher.register_instance(self.requestHandler)
         self.server.add_dispatcher("/", self.dispatcher)
 
+    @LogCall({"level": INFO})
     def run(self):
         self.server.serve_forever()
 
+    @LogCall({"level": INFO})
     def __del__(self):
         self.server.shutdown()
 
