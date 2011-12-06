@@ -26,5 +26,9 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
+    entry_points="""
+    [console_scripts]
+    rocketeer-client = rocketeer.client:main
+    """,
     install_requires = [ "pystache" ],
 )
