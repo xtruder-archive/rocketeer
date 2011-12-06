@@ -211,6 +211,26 @@ class App(object):
         if self._GetWatchdogStatus()==False:
             self._SetAppRunStatus(AppStatus.ERROR)
 
+class AppStatusUpdate(App):
+    def __init__(self):
+        App.__init__(self)
+
+    @synchronous("AppLock")
+    def _UpdateAppStatus(self):
+        """
+        Updates app's status.
+        This function must be called periodicly to fetch new app status.
+        
+        @return: Nothing
+        @rtype: C{None}
+        """
+        self.UpdateStatus()
+        if( self.GetAppRunStatus()!=AppStatus.STOPPED and \
+           self.GetAppRunStatus()!=AppStatus.ENDED and \
+           self.GetAppRunStatus()!=AppStatus.ERROR):
+            App._UpdateAppStatus(self)
+
+
 class AppProcess(App): #, Process):
     """
     App class for processes.
@@ -252,19 +272,3 @@ class AppProcess(App): #, Process):
             self._SetAppRunStatus(AppStatus.STOPPED)
 
         return 1
-
-    @synchronous("AppLock")
-    def _UpdateAppStatus(self):
-        """
-        Updates app's status.
-        This function must be called periodicly to fetch new app status.
-        
-        @return: Nothing
-        @rtype: C{None}
-        """
-
-        self.UpdateStatus()
-        if( self.GetAppRunStatus()!=AppStatus.STOPPED and \
-           self.GetAppRunStatus()!=AppStatus.ENDED and \
-           self.GetAppRunStatus()!=AppStatus.ERROR):
-            App._UpdateAppStatus(self)
