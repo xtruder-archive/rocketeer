@@ -394,6 +394,7 @@ class StatusUpdateProcess(Process, StatusUpdateNode):
         @rtype: C{boolean}
         """ 
         if not self.isRunning():
+            print "dgfsdfgssssssssssssssssssssssssssssssss!"
             if self.started:
                 self._SetAppRunStatus(AppStatus.ENDED)
             elif self.error:
@@ -402,6 +403,7 @@ class StatusUpdateProcess(Process, StatusUpdateNode):
                 self._SetAppRunStatus(AppStatus.STOPPED)
             return None
 
+        print "rub                                       qwfrwdgsdfg"
         #Needed for auto restart.
         self.started= True
         return True

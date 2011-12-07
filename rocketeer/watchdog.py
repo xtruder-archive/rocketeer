@@ -15,4 +15,4 @@ class AppWatchdog(object):
 
     @LogCall({"subdecorate": True})
     def GetRunningStatus(self):
-        pass
+        return True

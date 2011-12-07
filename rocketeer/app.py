@@ -3,6 +3,8 @@ import copy
 
 from synch import synchronous
 
+from PyLogDecorate.log import LogClass, LogCall
+
 class AppStatus:
     """
     Status of an app.
@@ -29,6 +31,7 @@ class AppStatus:
     Indicates that app is in not yet know state(on startup only)
     """ 
 
+@LogClass()
 class App(object):
     """
     Virtual aplication, that can be new process or just thread with all
@@ -62,6 +65,7 @@ class App(object):
         self.watchdogs.append(watchdog)
 
     @synchronous("AppLock")
+    @LogCall()
     def GetAppRunStatus(self):
         """
         Gets running status of an app.
@@ -76,6 +80,7 @@ class App(object):
         return self.AppRunStatus
 
     @synchronous("AppLock")
+    @LogCall()
     def _SetAppRunStatus(self, status):
         """
         Sets app's running status.
@@ -199,6 +204,7 @@ class App(object):
 
         return True
 
+    @LogCall()
     def _UpdateAppStatus(self):
         """
         Updates app's status.
@@ -231,12 +237,12 @@ class AppStatusUpdate(App):
             App._UpdateAppStatus(self)
 
 
-class AppProcess(App): #, Process):
+class AppProcess(AppStatusUpdate): #, Process):
     """
     App class for processes.
     """ 
     def __init__(self):
-        App.__init__(self)
+        AppStatusUpdate.__init__(self)
 
     @synchronous("AppLock")
     def StartApp(self):

@@ -20,6 +20,7 @@ class AppsHandler(object):
     """ 
 
     def __init__(self, server, auto_close= False):
+        print "init"
         self.server= server
 
         self.Apps= {}
@@ -50,11 +51,16 @@ class AppsHandler(object):
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def CreateApp(self, name):
+        if not self.Apps:
+            return 0
         if name not in self.Apps:
             return 0
 
-        id= random.getrandbits(16)
-        self.instances[id]= (self.Apps[name](), name)
+        id= int(random.getrandbits(16))
+        print self.Apps[name]
+        if not self.instances:
+            self.instances= {}
+        self.instances[id]= (self.Apps[name](), name,)
 
         dispatcher= SimpleXMLRPCDispatcher()
         dispatcher.register_introspection_functions()
@@ -86,7 +92,7 @@ class AppsHandler(object):
 
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
-    def DestroyInstances(self):
+    def DestroyInstanes(self):
         for id in self.instances.keys():
             self.DestroyInstance(id)
 
