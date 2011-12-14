@@ -20,6 +20,17 @@ class AppsHandler(object):
     """ 
 
     def __init__(self, server, auto_close= False):
+        """
+        Initializes apps handler.
+        
+        @param server: Server which uses this apps handler.
+        @type server: C{class}
+        @param auto_close: Does instances get closed automaticly when they exit.
+        @type auto_close: C{boolean}
+        
+        @return: ApssHandler
+        @rtype: L{ApssHandler}
+        """ 
         print "init"
         self.server= server
 
@@ -34,6 +45,17 @@ class AppsHandler(object):
     @synchronous("AppRegisterLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def RegisterApp(self, App, name=""):
+        """
+        Registers new app class, that can later be created.
+        
+        @param App: App class.
+        @type App: C{App}
+        @param name: Name of class or __class__ if not specificed.
+        @type name: C{str}
+        
+        @return: Nothing
+        @rtype: C{None}
+        """ 
         if not App:
             raise Exception("Cannot register App!")
 
@@ -45,12 +67,27 @@ class AppsHandler(object):
     @synchronous("AppRegisterLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def GetApps(self):
+        """
+        Gets all apps registered with RegisterApp.
+        
+        @return: List of all registered apps.
+        @rtype: C{List}
+        """ 
         return self.Apps.keys()
 
 #    @synchronous("AppRegisterLock")
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def CreateApp(self, name):
+        """
+        Creates new app.
+        
+        @param name: Name of an app.
+        @type name: C{str}
+        
+        @return: Instance id of an app.
+        @rtype: C{int}
+        """ 
         if not self.Apps:
             return 0
         if name not in self.Apps:
@@ -72,6 +109,12 @@ class AppsHandler(object):
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def GetAppInstances(self):
+        """
+        Gets all app instances.
+        
+        @return: List of set of app instnaces and it's class names.
+        @rtype: C{list}
+        """ 
         ret=()
         for id in self.instances.keys():
             ret+= ((id, self.instances[id][1]),)
@@ -81,6 +124,15 @@ class AppsHandler(object):
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def DestroyInstance(self, id):
+        """
+        Destroys instance by it's id.
+        
+        @param id: Id of an instance.
+        @type id: C{str} or C{int}
+        
+        @return: True if destruction was a success, or false otherwise.
+        @rtype: C{boolean}
+        """ 
         id= int(id)
         if not self.instances.has_key(id):
             return False
@@ -93,12 +145,29 @@ class AppsHandler(object):
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True, "level": INFO})
     def DestroyInstanes(self):
+        """
+        Destroys all instances.
+        
+        @return: True if destruction of all instances was a success of False otherwise.
+        @rtype: C{boolean}
+        """ 
+        ret= True
+
         for id in self.instances.keys():
-            self.DestroyInstance(id)
+            if not self.DestroyInstance(id):
+                ret= False
+
+        return ret
 
     @synchronous("AppInstanceLock")
     @LogCall({"subdecorate": True})
     def UpdateStatus(self):
+        """
+        Update status of an instances.
+        
+        @return: Nothing
+        @rtype: C{None}
+        """ 
         delete=[] # Auto close objects
         for key in self.instances:
             instance= self.instances[key][0]
@@ -126,12 +195,32 @@ class AppsHandler(object):
 
 
 class RHandler(SimpleXMLRPCRequestHandler):
+    """
+    Request handler for XML-RPC.
+    """ 
     rpc_paths = None
 
 @LogClass()
 class Server(Thread):
+    """
+    XML-RPC server.
+    """ 
+
     @LogCall()
     def __init__(self, requestHandler, host="localhost", port=8400):
+        """
+        Initializes server.
+        
+        @param requestHandler: Request handler for base class calls.
+        @type requestHandler: C{AppsHandler}
+        @param host: Host where to bind.
+        @type host: C{str}
+        @param port: Port where to bind.
+        @type port: C{int}
+        
+        @return: Instance of self.
+        @rtype: C{Server}
+        """ 
         Thread.__init__(self)
 
         self.server = MultiPathXMLRPCServer((host, port), requestHandler=RHandler)
@@ -143,11 +232,29 @@ class Server(Thread):
 
     @LogCall({"level": INFO})
     def run(self):
+        """
+        Runs server.
+        
+        @return: Nothing
+        @rtype: C{None}
+        """ 
         self.server.serve_forever()
 
     @LogCall({"level": INFO})
     def __del__(self):
+        """
+        Stops server.
+        
+        @return: Nothing
+        @rtype: C{None}
+        """ 
         self.server.shutdown()
 
     def GetRequestHandler(self):
+        """
+        Gets base request handler used with this server.
+        
+        @return: Request handler used with this server.
+        @rtype: C{AppsHandler}
+        """ 
         return self.requestHandler
