@@ -170,25 +170,67 @@ class App(object):
         """
         Starts app.
         Please note that it also start all watchdogs.
+
+		Also don't forget to call StartPrologue and EndPrologue in your StartApp,
+		so watchdogs will be able to handle
         
         @return: Nothing
         @rtype: C{None}
         """
 
+		pass
+
+	def _StartPrologue(self):
+		"""
+		Called before app is stated
+
+		It has to be called on beginning of children classes of App in StartApp
+		function.
+
+		@return: Nothing
+		@rtype: C{None}
+		"""
+
         for watchdog in self.watchdogs:
-            watchdog.StartWatchdog()
+			if hasattr(watchdog,"startBeforeAppStart") \
+				and watchdog.startBeforeAppStart:
+				watchdog.StartWatchdog()
+
+	def _StartEpilogue(self):
+		"""
+		Called after app is started.
+
+		It has to be called on end of children classed of App in StartApp function.
+
+		@return: Nothing
+		@rtype: C{None}
+		"""
+
+        for watchdog in self.watchdogs:
+			if (hasattr(watchdog,"startBeforeAppStart") and not watchdog.startBeforeAppStart) 
+				or not hasattr(watchdog, "startBeforeAppStart"):
+				watchdog.StartWatchdog()
+
 
     @synchronous("AppLock")
     def StopApp(self):
         """
         Stops app.
+
+		It has to be called at beginning of children class of App in StopApp function.
         
         @return: Nothing
         @rtype: C{None}
         """
 
+		# We assume that we stop all watchdogs before actuall application is stopped
         for watchdog in self.watchdogs:
-            watchdog.StopWatchdog()
+			# Except for watchdogs that are started on end.
+			# This is used for chainloaded applications.
+			# One cool thing is that output from stoped app can be used in newly started app.
+			if hasattr(watchdog,"startOnAppEnd"):
+				watchdog.StartApp()
+			watchdog.StopWatchdog()
 
     def _GetWatchdogStatus(self):
         """
@@ -254,10 +296,12 @@ class AppProcess(AppStatusUpdate): #, Process):
         @rtype: C{None}
         """
 
-        App.StartApp(self)
+        App.StartPrologue(self)
 
         self._SetAppRunStatus(AppStatus.UNKNOWN)
         self.Start() # We can do that in python :)
+
+		App.StartEpilogue()
         return 1
 
     @synchronous("AppLock")
