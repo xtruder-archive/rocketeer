@@ -3,7 +3,7 @@ ROCKETEER - Advanced app launcher and manager
 
 Description
 -----------
-Rocketeer is very smart remote process launcher, watchdog and manager. It has abilty to start user commands from templates, to which you can pass parameters, to controle those processes and parse statuses. The main power is remote xml-rpc interface.
+Rocketeer is very smart remote process launcher, watchdog and manager. It has ability to start user commands from templates, to which you can pass parameters, to controle those processes and parse statuses. The main power is remote xml-rpc interface.
 
 Installation
 -----------
